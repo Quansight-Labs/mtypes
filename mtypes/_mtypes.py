@@ -23,6 +23,10 @@ class _mclass(type):
             def __neq__(self, other):
                 return self.ndt != other.ndt
 
+            @property
+            def shape(self):
+                return self.ndt.shape
+
         class NdtGeneric(xnd, metaclass=mclass_specific):
             def __new__(cls, *args, **kwargs):
                 return xnd(*args, **kwargs, type=key)
