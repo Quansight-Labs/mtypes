@@ -1,21 +1,21 @@
 from ndtypes import ndt
 from xnd import xnd
 
-__all__ = ['Ndt']
+__all__ = ['mtype']
 
 
-class mtype(type):
+class _mclass(type):
     def __class_getitem__(cls, key):
         key = ndt(key)
 
-        class mtype_specific(mtype):
+        class mclass_specific(_mclass):
             ndt = key
 
             def __instancecheck__(self, instance):
                 return isinstance(instance, xnd) and instance.type == self.ndt
 
             def __subclasscheck__(self, subclass):
-                return super().__subclasscheck__(subclass) and self.ndt == subclass.ndt
+                return self.ndt == subclass.ndt
 
             def __eq__(self, other):
                 return self.ndt == other.ndt
@@ -23,7 +23,7 @@ class mtype(type):
             def __neq__(self, other):
                 return self.ndt != other.ndt
 
-        class NdtGeneric(xnd, metaclass=mtype_specific):
+        class NdtGeneric(xnd, metaclass=mclass_specific):
             def __new__(cls, *args, **kwargs):
                 return xnd(*args, **kwargs, type=key)
 
@@ -33,8 +33,9 @@ class mtype(type):
         return isinstance(self, ndt)
 
     def __subclasscheck__(self, subclass):
-            return isinstance(subclass, mtype)
+            return issubclass(subclass, ndt) or isinstance(subclass, _mclass)
 
 
-class Ndt(ndt, metaclass=mtype):
-    pass
+class mtype(ndt, metaclass=_mclass):
+    def __new__(cls, *args, **kwargs):
+        return ndt(*args, **kwargs)
