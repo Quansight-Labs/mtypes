@@ -49,3 +49,9 @@ def test_subclass(input_type, output_type):
 @mark_input_types
 def test_subclass_from_generic(input_type):
     assert issubclass(Ndt[input_type], Ndt)
+
+@mark_input_types
+def test_creation(input_type):
+    x = Ndt[input_type](0)
+
+    assert isinstance(x, Ndt[input_type])
