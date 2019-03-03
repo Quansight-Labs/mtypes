@@ -5,6 +5,17 @@ __all__ = ['mtype']
 
 
 class _mclass(type):
+    def __instancecheck__(self, instance):
+        return isinstance(self, ndt)
+
+    def __subclasscheck__(self, subclass):
+            return issubclass(subclass, ndt) or isinstance(subclass, _mclass)
+
+
+class mtype(ndt, metaclass=_mclass):
+    def __new__(cls, *args, **kwargs):
+        return ndt(*args, **kwargs)
+
     def __class_getitem__(cls, key):
         key = ndt(key)
 
@@ -26,19 +37,8 @@ class _mclass(type):
             def __getattr__(self, key):
                 return getattr(self.ndt, key)
 
-        class NdtGeneric(xnd, metaclass=mclass_specific):
+        class NdtSpecific(xnd, metaclass=mclass_specific):
             def __new__(cls, *args, **kwargs):
                 return xnd(*args, **kwargs, type=key)
 
-        return NdtGeneric
-
-    def __instancecheck__(self, instance):
-        return isinstance(self, ndt)
-
-    def __subclasscheck__(self, subclass):
-            return issubclass(subclass, ndt) or isinstance(subclass, _mclass)
-
-
-class mtype(ndt, metaclass=_mclass):
-    def __new__(cls, *args, **kwargs):
-        return ndt(*args, **kwargs)
+        return NdtSpecific
