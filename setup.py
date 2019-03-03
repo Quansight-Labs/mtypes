@@ -100,6 +100,4 @@ setup (
         "Topic :: Software Development"
     ],
     packages = ["mtypes"],
-    ext_modules = [Extension(name = "mtypes._mtypes",
-                             sources = ["mtypes/_mtypes.c"])],
 )
