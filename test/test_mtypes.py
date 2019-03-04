@@ -74,3 +74,10 @@ def test_type(input_type):
     value = value_of_shape(input_mtype.shape)
     assert type(input_mtype(value)) is input_mtype
     assert type(input_mtype) is mtype
+
+@mark_both_types
+def test_caching(input_type, output_type):
+    expected = ndt(input_type) == ndt(output_type)
+
+    assert expected == (mtype(input_type) is mtype(output_type))
+    assert expected == (mtype(input_type) == mtype(output_type))

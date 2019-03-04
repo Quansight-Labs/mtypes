@@ -4,6 +4,9 @@ from xnd import xnd
 __all__ = ['Xnd', 'mtype']
 
 
+_mtype_dict = {}
+
+
 class _XndMeta(type):
     def __call__(self, *args, type=None, **kwargs):
         if type is None:
@@ -26,15 +29,21 @@ class mtype(type):
     def __new__(cls, t: str):
         t = ndt(t)
 
+        if t in _mtype_dict:
+            return _mtype_dict[t]
+
         class XndSpecific:
             def __init__(self, *args, **kwargs):
                 self.xnd = xnd(*args, type=t, **kwargs)
 
             def __getattr__(self, key):
-                getattr(xnd, key)
+                getattr(self.xnd, key)
 
         name = f"{cls.__name__}({str(t)})"
         return super().__new__(cls, name, XndSpecific.__bases__, {**XndSpecific.__dict__, '__module__': __name__, '__qualname__': name, 'ndt': t})
+
+    def __init__(self, t: str):
+        _mtype_dict[self.ndt] = self
 
     def __instancecheck__(self, instance):
         return isinstance(type(instance), type(self)) and self.ndt == type(instance).ndt
