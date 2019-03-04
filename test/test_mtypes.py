@@ -63,8 +63,9 @@ def test_subclass(input_type, output_type):
 def test_subclass_from_generic(input_type):
     assert issubclass(mtype(input_type), Xnd)
 
+
 @mark_input_types
 def test_creation(input_type):
-    input_mtype=mtype(input_type)
-    value=value_of_shape(input_mtype.shape)
+    input_mtype = mtype(input_type)
+    value = value_of_shape(input_mtype.shape)
     assert isinstance(input_mtype(value), mtype(input_type))

@@ -3,19 +3,20 @@ from xnd import xnd
 
 __all__ = ['Xnd', 'mtype']
 
+
 class _XndMeta(type):
     def __call__(self, *args, type=None, **kwargs):
         if type is None:
             raise ValueError('type must be provided.')
-            
+
         return mtype(type)(*args, **kwargs)
-    
+
     def __instancecheck__(self, instance):
         return isinstance(type(instance), mtype)
 
     def __subclasscheck__(self, subclass):
         return isinstance(subclass, mtype)
-        
+
 
 class Xnd(metaclass=_XndMeta):
     pass
