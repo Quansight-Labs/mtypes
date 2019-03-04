@@ -10,10 +10,7 @@ from mtypes import mtype, Xnd
 
 def chain_marks(*marks):
     def inner(func):
-        for mark in reversed(marks):
-            func = mark(func)
-
-        return func
+        return functools.reduce(lambda x, y: y(x), reversed(marks), func)
 
     return inner
 
