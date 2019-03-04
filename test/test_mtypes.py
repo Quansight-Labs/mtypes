@@ -76,3 +76,4 @@ def test_type(input_type):
     input_mtype = mtype(input_type)
     value = value_of_shape(input_mtype.shape)
     assert type(input_mtype(value)) is input_mtype
+    assert type(input_mtype) is mtype
