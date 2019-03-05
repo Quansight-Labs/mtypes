@@ -1,5 +1,8 @@
+#!python
+
+
+
 from ndtypes import ndt
-from xnd import xnd
 
 __all__ = ['Xnd', 'mtype']
 
@@ -7,49 +10,63 @@ __all__ = ['Xnd', 'mtype']
 _mtype_dict = {}
 
 
-class _XndMeta(type):
-    def __call__(self, *args, type=None, **kwargs):
+class Xnd:
+    def __new__(cls, *args, type=None, **kwargs):
         if type is None:
             raise ValueError('type must be provided.')
 
         return mtype(type)(*args, **kwargs)
 
-    def __instancecheck__(self, instance):
-        return isinstance(type(instance), mtype)
-
-    def __subclasscheck__(self, subclass):
-        return isinstance(subclass, mtype)
-
-
-class Xnd(metaclass=_XndMeta):
-    pass
-
 
 class mtype(type):
-    def __new__(cls, t: str):
+    def __new__(cls, t):
         t = ndt(t)
 
         if t in _mtype_dict:
             return _mtype_dict[t]
 
-        class XndSpecific:
+        class XndSpecific(Xnd):
+            _ndt = t
+
+            def __new__(cls, *args, **kwargs):
+                return object.__new__(cls)
+
             def __init__(self, *args, **kwargs):
-                self.xnd = xnd(*args, type=t, **kwargs)
+                t_other = kwargs.pop('type', t)
+
+                if ndt(t_other) != t:
+                    raise ValueError(
+                        'type Passed in must be consistent with existing type'
+                    )
+
+                try:
+                    from xnd import xnd
+                except ImportError:
+                    raise RuntimeError(
+                        'xnd must be installed for instantiation to work.')
+
+                self._xnd = xnd(*args, type=t, **kwargs)
 
             def __getattr__(self, key):
-                getattr(self.xnd, key)
+                getattr(self._xnd, key)
 
-        name = f"{cls.__name__}({str(t)})"
-        return super().__new__(cls, name, XndSpecific.__bases__, {**XndSpecific.__dict__, '__module__': __name__, '__qualname__': name, 'ndt': t})
+            def __getitem__(self, key):
+                return self._xnd[key]
+
+            def __setitem__(self, key, value):
+                self._xnd[key] = value
+
+        name = f'{cls.__name__}({str(t)})'
+        return super().__new__(cls, name, (XndSpecific,), {**XndSpecific.__dict__, '__module__': __name__, '__qualname__': name})
 
     def __init__(self, t: str):
-        _mtype_dict[self.ndt] = self
+        _mtype_dict[self._ndt] = self
 
     def __instancecheck__(self, instance):
-        return isinstance(type(instance), type(self)) and self.ndt == type(instance).ndt
+        return isinstance(type(instance), type(self)) and self._ndt == type(instance)._ndt
 
     def __subclasscheck__(self, subclass):
-        return isinstance(subclass, type(self)) and self.ndt == subclass.ndt
+        return isinstance(subclass, type(self)) and self._ndt == subclass._ndt
 
     def __getattr__(self, key):
-        return getattr(self.ndt, key)
+        return getattr(self._ndt, key)
