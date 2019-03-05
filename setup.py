@@ -34,12 +34,8 @@ import sys, os
 import platform
 import warnings
 
-if "bdist_wheel" in sys.argv:
-    from setuptools import setup, Extension
-else:
-    from distutils.core import setup, Extension
-
-from distutils.sysconfig import get_python_lib
+from setuptools import setup, Extension
+from Cython.Build import cythonize
 
 DESCRIPTION = """\
 Meta-class of type that extends Python type system to create dtype-like memory-types\
@@ -63,15 +59,17 @@ Links
 
 """
 
-warnings.simplefilter("ignore", UserWarning)
+extensions = [
+    Extension("*", ["**/*.pyx"]),
+]
 
-PY_MAJOR = sys.version_info[0]
-PY_MINOR = sys.version_info[1]
-ARCH = platform.architecture()[0]
 
-if PY_MAJOR < 3:
-    raise NotImplementedError(
-        "python2 support is not implemented")
+from Cython.Compiler import Options
+from Cython import Compiler
+
+Options.docstrings = False
+Options.annotate = True
+
 
 setup (
     name = "mtypes",
@@ -100,4 +98,6 @@ setup (
         "Topic :: Software Development"
     ],
     packages = ["mtypes"],
+    python_requires='>=3.5, <4',
+    ext_modules = cythonize(extensions)
 )
