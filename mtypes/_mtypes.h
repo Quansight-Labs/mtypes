@@ -45,3 +45,4 @@ typedef struct _ndtobj {
 } PyNdtObject;
 
 PyMODINIT_FUNC PyInit__mtypes(void);
+PyObject* PyNdt_Type_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds);
