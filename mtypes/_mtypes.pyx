@@ -1,7 +1,3 @@
-#!python
-
-
-
 from ndtypes import ndt
 
 __all__ = ['Xnd', 'mtype']
@@ -25,7 +21,12 @@ class mtype(type):
         if t in _mtype_dict:
             return _mtype_dict[t]
 
+        name = f'{cls.__name__}({str(t)})'
+
         class XndSpecific(Xnd):
+            __module__ = __name__
+            __qualname__ = name
+
             _ndt = t
 
             def __new__(cls, *args, **kwargs):
@@ -55,9 +56,8 @@ class mtype(type):
 
             def __setitem__(self, key, value):
                 self._xnd[key] = value
-
-        name = f'{cls.__name__}({str(t)})'
-        return super().__new__(cls, name, (XndSpecific,), {**XndSpecific.__dict__, '__module__': __name__, '__qualname__': name})
+        
+        return super().__new__(cls, name, (XndSpecific,), {})
 
     def __init__(self, t: str):
         _mtype_dict[self._ndt] = self

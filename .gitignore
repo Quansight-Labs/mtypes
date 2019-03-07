@@ -1,3 +1,6 @@
 .vscode/
 .pytest_cache/
 *.pyc
+mtypes.egg-info/
+*.ipynb
+./ipynb_checkpoints
