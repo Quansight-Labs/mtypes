@@ -1,15 +1,6 @@
 #include "_mtypes.h"
 
-static PyTypeObject PyNdt_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "mtypes.ndt",
-    .tp_doc = "Memory type of a Python array",
-    .tp_basicsize = sizeof(PyNdtObject),
-    .tp_itemsize = 0,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_init = PyNdt_Type_init,
-    .tp_base = &PyType_Type,
-};
+
 
 static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
@@ -42,6 +33,17 @@ PyObject* PyNdt_Type_init(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
     return NULL;
 }
+
+static PyTypeObject PyNdt_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "mtypes.ndt",
+    .tp_doc = "Memory type of a Python array",
+    .tp_basicsize = sizeof(PyNdtObject),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_init = PyNdt_Type_init,
+    .tp_base = &PyType_Type,
+};
 
 PyMODINIT_FUNC
 PyInit__mtypes(void) {
