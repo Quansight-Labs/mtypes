@@ -39,19 +39,27 @@ typedef struct _xndobj {
     xnd_t xndobj;
 } PyXndObject;
 
-
 typedef struct _ndtobj {
-    PyTypeObject pytypeobj;
+    PyHeapTypeObject pytypeobj;
     ndt_t ndtobj;
 } PyNdtObject;
 
 static PyTypeObject PyMtypeObject = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "mtypes.mtype",
+    .tp_name = "mtypes.mtype", // I think this might be the issue as well; Try building again?
     .tp_doc = "Memory type of a Python array",
     .tp_basicsize = sizeof(PyNdtObject),
-    .tp_itemsize = 0, // TODO: Change value to make this dynamic
+    .tp_itemsize = 0,
     .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_new = PyType_GenericNew,
     .tp_base = &PyType_Type,
 };
+
+static PyModuleDef mtypes_module = {
+    PyModuleDef_HEAD_INIT,
+    .m_name = "mtypes", // I think this and line 49 should agree
+    .m_doc = "Creates a meta-type extending the Python type-system for array objects.",
+    .m_size = -1,
+};
+
+PyMODINIT_FUNC PyInit_custom(void);
