@@ -11,7 +11,7 @@ apt-get -y update && \
 apt-get -y upgrade && \
 apt-get install -y build-essential && \
 apt-get install -y software-properties-common && \
-apt-get install -y vim htop curl git wget 
+apt-get install -y vim htop curl git wget gdb
 
 
 # Setting up environment for Miniconda
@@ -31,8 +31,6 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-4.5.12-Linux-x86
     echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
-# Allows to debug within the Docker Machine
-RUN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined
 # Making a new Workspace so we aren't bogged down by Linux
 RUN mkdir workspace
 RUN cd workspace
