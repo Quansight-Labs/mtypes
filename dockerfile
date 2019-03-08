@@ -11,7 +11,7 @@ apt-get -y update && \
 apt-get -y upgrade && \
 apt-get install -y build-essential && \
 apt-get install -y software-properties-common && \
-apt-get install -y vim htop curl git wget gdb
+apt-get install -y vim htop curl git wget gdb vagrind lldb
 
 
 # Setting up environment for Miniconda
