@@ -7,67 +7,65 @@ static PyModuleDef mtypes_module = {
     .m_size = -1,
 };
 
+static int
+PyMtype_ArgParse(PyObject *args, PyObject *kwds, PyObject**args_out, PyObject** kwds_out, long* thing_out) {
+    static char *kwlist[] = {"", "", "", "custom", NULL};
+
+    PyObject *name, *bases, *namespace;
+    
+    *args_out = NULL;
+    *kwds_out = NULL;
+    long thing;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__init__", kwlist,
+                                        &name, &bases, &namespace, &thing))
+        goto fail;
+
+    *kwds_out = PyDict_New();
+    if (*kwds_out == NULL)
+        goto fail;
+
+    *args_out = Py_BuildValue("(OOO)", name, bases, namespace);
+    if (*args_out == NULL)
+        goto fail;
+
+    *thing_out = thing;
+    
+    Py_DECREF(args);
+    Py_DECREF(kwds);
+
+    return 0;
+
+    fail:
+    Py_XDECREF(*kwds_out);
+    Py_XDECREF(*args_out);
+    return -1;
+}
+
 static
 int PyMtypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
     printf("mtypes.__init__\n");
-    static char* kw = "custom";
-    static char *kwlist[] = {"", "", "", "custom", NULL};
-
-    PyMtypeObject* mtypeobj = (PyMtypeObject*) self;
-    // TODO: Look up how to take care of the "dummy" variables.
-    // https://docs.python.org/3/c-api/arg.html#c.PyArg_ParseTupleAndKeywords 
-    PyObject* dummy1, *dummy2, *dummy3;
+    PyObject *args_out, *kwds_out;
     long thing;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__init__", kwlist,
-                                        &dummy1, &dummy2, &dummy3, &thing))
-        goto fail;
-
-    mtypeobj->stuff = thing;
-
-    if (PyDict_DelItemString(kwds, kw) < 0)
-        goto fail;
-
-    PyObject* key = PyUnicode_FromString(kw);
-    PyObject* value = PyLong_FromLong(thing);
-
-    if (key == NULL || value == NULL)
+    if (PyMtype_ArgParse(args, kwds, &args_out, &kwds_out, &thing) < 0)
         goto fail;
     
-    PyType_Type.tp_init(self, args, kwds);
-
-    if (PyObject_SetItem(self, key, value) < 0)
-        goto fail;
-
-    Py_DECREF(key);
-    Py_DECREF(value);
-    return 0;
-
+    ((PyMtypeObject *) self)->stuff = thing;
+    
+    return PyType_Type.tp_init(self, args_out, kwds_out);
 
     fail:
-    Py_XDECREF(key);
-    Py_XDECREF(value);
     return -1;
 }
 
 static
 PyObject* PyMtypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     printf("mtypes.__new__\n");
-
-    static char *kwlist[] = {"", "", "", "custom", NULL};
-    PyObject* dummy1, *dummy2, *dummy3;
+    PyObject *args_out, *kwds_out;
     long thing;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__new__", kwlist,
-                                        &dummy1, &dummy2, &dummy3, &thing))
+    if (PyMtype_ArgParse(args, kwds, &args_out, &kwds_out, &thing) < 0)
         goto fail;
 
-    kwds = PyDict_Copy(kwds);
-    if (kwds == NULL)
-        goto fail;
-
-    if (PyDict_DelItemString(kwds, "custom") < 0)
-        goto fail;
-    
-    return PyType_Type.tp_new(type, args, kwds);
+    return PyType_Type.tp_new(type, args_out, kwds_out);
 
     fail:
     return NULL;
