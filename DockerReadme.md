@@ -10,10 +10,10 @@ docker build -t <image_name> .
 Build within the folder where the dockerfile is contained.
 
 ```shell
-docker run -v /host/directory:/workspace/ --rm -it image_name
+docker run -v /host/directory:/workspace/ --rm -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined <image_name>
 ```
 
-Where host directory is the mtypes folder, mapped to here.
+Where host directory is the mtypes folder, mapped to here. The options also allow for gdb to run.
 
 To delete all instances and restart:
 ```shell
