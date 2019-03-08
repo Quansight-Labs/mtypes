@@ -11,15 +11,15 @@ static
 int PyMtypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
     printf("mtypes.__init__\n");
     static char* kw = "custom";
-    static char *kwlist[] = {"custom", NULL};
+    static char *kwlist[] = {"", "", "", "custom", NULL};
 
     PyMtypeObject* mtypeobj = (PyMtypeObject*) self;
     // TODO: Look up how to take care of the "dummy" variables.
     // https://docs.python.org/3/c-api/arg.html#c.PyArg_ParseTupleAndKeywords 
-    PyObject* dummy1, dummy2, dummy3;
+    PyObject* dummy1, *dummy2, *dummy3;
     long thing;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__new__", kwlist,
-                                        dummy1, dummy2, dummy3, &thing))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__init__", kwlist,
+                                        &dummy1, &dummy2, &dummy3, &thing))
         goto fail;
 
     mtypeobj->stuff = thing;
@@ -32,13 +32,14 @@ int PyMtypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
 
     if (key == NULL || value == NULL)
         goto fail;
+    
+    PyType_Type.tp_init(self, args, kwds);
 
     if (PyObject_SetItem(self, key, value) < 0)
         goto fail;
 
     Py_DECREF(key);
     Py_DECREF(value);
-    PyType_Type.tp_init(self, args, kwds);
     return 0;
 
 
@@ -52,11 +53,11 @@ static
 PyObject* PyMtypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     printf("mtypes.__new__\n");
 
-    static char *kwlist[] = {"custom", NULL};
-    PyObject* dummy1, dummy2, dummy3;
+    static char *kwlist[] = {"", "", "", "custom", NULL};
+    PyObject* dummy1, *dummy2, *dummy3;
     long thing;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__new__", kwlist,
-                                        dummy1, dummy2, dummy3, &thing))
+                                        &dummy1, &dummy2, &dummy3, &thing))
         goto fail;
 
     kwds = PyDict_Copy(kwds);
