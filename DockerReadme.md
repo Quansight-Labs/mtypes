@@ -4,7 +4,7 @@ This version of docker is customized for the enviorment that we are using.
 We have a folder called workspace to map the data into.
 
 ```shell
-docker build <image_name> .
+docker build -t <image_name> .
 ```
 
 Build within the folder where the dockerfile is contained.

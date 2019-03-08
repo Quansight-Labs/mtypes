@@ -30,19 +30,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ndtypes.h"
-#include "xnd.h"
 #include "Python.h"
 
-typedef struct _xndobj {
-    PyObject_HEAD
-    xnd_t xndobj;
-} PyXndObject;
+typedef struct _mtypetype {
+    PyTypeObject mt_type;
+} PyMtype_Type;
 
-typedef struct _ndtobj {
-    PyHeapTypeObject pytypeobj;
-    ndt_t ndtobj;
-} PyNdtObject;
+typedef struct _mtypeobject {
+    PyHeapTypeObject mt_obj;
+    long stuff;
+    void* members;
+} PyMtypeObject;
 
 PyMODINIT_FUNC PyInit__mtypes(void);
-PyObject* PyNdt_Type_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds);
+static
+int PyMtypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
