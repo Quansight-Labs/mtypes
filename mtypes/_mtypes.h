@@ -32,16 +32,14 @@
 
 #include "Python.h"
 
-typedef struct _mtypetype {
-    PyTypeObject mt_type;
-} PyMtype_Type;
-
 typedef struct _mtypeobject {
     PyHeapTypeObject mt_obj;
     long stuff;
     void* members;
-} PyMtypeObject;
+} PyMTypeObject;
+
+PyAPI_DATA(PyMTypeObject) PyMType_Type;
 
 PyMODINIT_FUNC PyInit__mtypes(void);
 static
-int PyMtypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
+int PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
