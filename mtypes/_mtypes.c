@@ -64,7 +64,6 @@ PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject *
 
 static int
 PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
-    printf("mtypes.__init__\n");
     PyObject *args_out, *kwds_out;
     long custom;
     if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
@@ -80,7 +79,6 @@ PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
 
 static PyObject*
 PyMTypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    printf("mtypes.__new__\n");
     PyObject *args_out, *kwds_out;
     long custom;
     if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
