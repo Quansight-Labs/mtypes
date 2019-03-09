@@ -75,7 +75,7 @@ setup (
     keywords = ["xnd", "array computing", "types", "memory blocks"],
     platforms = ["Many"],
     classifiers = [
-        "Development Status :: 1 - Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
