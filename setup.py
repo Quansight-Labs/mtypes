@@ -50,7 +50,7 @@ Overview
 --------
 
 The "mtypes" package provides a memory-type system suitable for use by any container, object, or 
-library where the memory-layout matters.
+library where the memory-layout matters or access to fast native-code implementations is needed.
 
 Specifically it creates a new sub-class of type at the CPython layer so that every mtype is a type
 but with special function pointers needed for manipulating the raw memory that the type implies.
