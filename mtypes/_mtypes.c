@@ -8,61 +8,85 @@ static PyModuleDef mtypes_module = {
 };
 
 static int
-PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject**args_out, PyObject** kwds_out, long* thing_out) {
-    static char *kwlist[] = {"", "", "", "custom", NULL};
+PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject **kwds_out, long *custom_out) {
+    static char *kwlist[] = {"", "", "", NULL};
 
     PyObject *name, *bases, *namespace;
     
     *args_out = NULL;
     *kwds_out = NULL;
-    long thing;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOl:mtype.__init__", kwlist,
-                                        &name, &bases, &namespace, &thing))
+    PyObject* namespace_new = NULL;
+    PyObject* key = NULL;
+    PyObject* custom_obj = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOO:mtype.__new__", kwlist,
+                                        &name, &bases, &namespace))
         goto fail;
 
     *kwds_out = PyDict_New();
     if (*kwds_out == NULL)
         goto fail;
 
-    *args_out = Py_BuildValue("(OOO)", name, bases, namespace);
-    if (*args_out == NULL)
+    namespace_new = PyDict_Copy(namespace);
+    if (namespace_new == NULL)
         goto fail;
 
-    *thing_out = thing;
+    key = PyUnicode_FromString("custom");
+    if (key == NULL)
+        goto fail;
+
+    custom_obj = PyDict_GetItemWithError(namespace_new, key);
+    if (custom_obj == NULL) {
+        if (PyErr_Occurred() == NULL)
+            PyErr_SetString(PyExc_ValueError, "mtype.__new__ expects a \"custom\" key in its third argument.");
+        goto fail;
+    }
+
+    *custom_out = PyLong_AsLong(custom_obj);
+    if (PyErr_Occurred() != NULL)
+        goto fail;
+
+    if (PyDict_DelItem(namespace_new, key) < 0)
+        goto fail;
+
+    *args_out = Py_BuildValue("(OOO)", name, bases, namespace_new);
+    if (*args_out == NULL)
+        goto fail;
 
     return 0;
 
     fail:
     Py_XDECREF(*kwds_out);
     Py_XDECREF(*args_out);
+    Py_XDECREF(key);
+    Py_XDECREF(custom_obj);
     return -1;
 }
 
-static
-int PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
+static int
+PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds) {
     printf("mtypes.__init__\n");
     PyObject *args_out, *kwds_out;
-    long thing;
-    if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &thing) < 0)
+    long custom;
+    if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
         goto fail;
     
-    ((PyMTypeObject *) self)->stuff = thing;
+    ((PyMTypeObject *) self)->custom = custom;
     
-    return ((PyTypeObject *)self)->tp_base->tp_init(self, args_out, kwds_out);
+    return self->ob_type->tp_base->tp_init(self, args_out, kwds_out);
 
     fail:
     return -1;
 }
 
-static
-PyObject* PyMTypeObject_new(PyTypeObject *self, PyObject *args, PyObject *kwds) {
+static PyObject*
+PyMTypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     printf("mtypes.__new__\n");
     PyObject *args_out, *kwds_out;
-    long thing;
-    if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &thing) < 0)
+    long custom;
+    if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
         goto fail;
 
-    return self->tp_base->tp_new(self, args_out, kwds_out);
+    return type->tp_base->tp_new(type, args_out, kwds_out);
 
     fail:
     return NULL;

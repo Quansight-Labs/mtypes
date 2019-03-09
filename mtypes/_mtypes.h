@@ -34,12 +34,11 @@
 
 typedef struct _mtypeobject {
     PyHeapTypeObject mt_obj;
-    long stuff;
-    void* members;
+    long custom;
 } PyMTypeObject;
 
 PyAPI_DATA(PyMTypeObject) PyMType_Type;
 
 PyMODINIT_FUNC PyInit__mtypes(void);
-static
-int PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
+static int PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
+static PyObject* PyMTypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
