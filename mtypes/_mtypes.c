@@ -59,6 +59,7 @@ PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject *
     Py_XDECREF(*args_out);
     Py_XDECREF(key);
     Py_XDECREF(custom_obj);
+    Py_XDECREF(namespace_new);
     return -1;
 }
 
