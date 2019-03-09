@@ -63,16 +63,6 @@ Links
 
 """
 
-warnings.simplefilter("ignore", UserWarning)
-
-PY_MAJOR = sys.version_info[0]
-PY_MINOR = sys.version_info[1]
-ARCH = platform.architecture()[0]
-
-if PY_MAJOR < 3:
-    raise NotImplementedError(
-        "python2 support is not implemented")
-
 setup (
     name = "mtypes",
     version = "0.1",
@@ -88,8 +78,8 @@ setup (
         "Development Status :: 1 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
-        "Intended Audience :: Financial and Insurance Industry",
         "Intended Audience :: Science/Research",
+        "Intended Audience :: Financial and Insurance Industry",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: C",
         "Programming Language :: Python :: 3",
@@ -102,4 +92,5 @@ setup (
     packages = ["mtypes"],
     ext_modules = [Extension(name = "mtypes._mtypes",
                              sources = ["mtypes/_mtypes.c"])],
+    python_requires=">=3.5, <4",
 )
