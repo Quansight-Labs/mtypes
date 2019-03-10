@@ -65,7 +65,7 @@ Links
 
 setup (
     name = "mtypes",
-    version = "0.1",
+    version = "0.1.1",
     description = DESCRIPTION,
     long_description = LONG_DESCRIPTION,
     url = "https://github.com/Quansight-Labs/mtypes",
@@ -90,6 +90,7 @@ setup (
         "Topic :: Software Development"
     ],
     packages = ["mtypes"],
+    package_data = {"mtypes" : ["_mtypes.h"]},
     ext_modules = [Extension(name = "mtypes._mtypes",
                              sources = ["mtypes/_mtypes.c"])],
     python_requires=">=3.5, <4",
