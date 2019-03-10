@@ -26,6 +26,12 @@ PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject *
     if (*kwds_out == NULL)
         goto fail;
 
+    if (!PyDict_Check(namespace))
+    {
+        PyErr_SetString(PyExc_ValueError, "mtype.__new__ expects a dict instance in its third argument.");
+        goto fail;
+    }
+
     namespace_new = PyDict_Copy(namespace);
     if (namespace_new == NULL)
         goto fail;
@@ -91,6 +97,27 @@ PyMTypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return NULL;
 }
 
+PyObject *PyMType_GetCustom(PyObject *self, void *closure) {
+    long custom = ((PyMTypeObject *)self)->custom;
+    return PyLong_FromLong(custom);
+}
+
+int PyMType_SetCustom(PyObject *self, PyObject* value, void* closure) {
+    long custom = PyLong_AsLong(value);
+    if (PyErr_Occurred() != NULL)
+        goto fail;
+    ((PyMTypeObject *)self)->custom = custom;
+    return 0;
+    fail:
+    return -1;
+}
+
+static PyGetSetDef PyMType_Type_getsetters[] = {
+    {"custom", (getter) PyMType_GetCustom, (setter) PyMType_SetCustom,
+     "custom", NULL},
+    {NULL}  /* Sentinel */
+};
+
 PyMTypeObject PyMType_Type = {
     .mt_obj = {
         .ht_type = {
@@ -103,6 +130,7 @@ PyMTypeObject PyMType_Type = {
             .tp_base = &PyType_Type,
             .tp_new = PyMTypeObject_new,
             .tp_init = PyMTypeObject_init,
+            .tp_getset = PyMType_Type_getsetters,
         }
     }
 };
