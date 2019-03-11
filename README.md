@@ -15,6 +15,8 @@ Memory Types for Python
 - Easy marshalling of python types between Python and C.
 - A universal mechanism for easily calling out to C code from Python.
 
+`mtypes` does not aim to be another monolithic Python-to-C library, instead it focuses on extending the Python type system to make wrapping C libraries easier. It aims to do this by making it possible to associate C information with a type, and C information with objects, in addition to mechanisms that allow calling out to C natively from Python (the `__cdict__` protocol).
+
 ## Use Cases
 `mtypes` intends to let objects work seamlessly between C and Python, meaning that there are several use cases. Common ones include:
 
