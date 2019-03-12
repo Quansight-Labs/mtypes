@@ -6,17 +6,22 @@ C-level information with your ``type`` objects like classes within
 Python. Also, objects instantiated from those types also have C-level
 data associated with them.
 
-``PyMType`` and ``PyMTypeObject``
----------------------------------
+``PyMTypeObject`` and ``PyMObject``
+-----------------------------------
 
 .. code:: c
 
-   typedef struct _mtype {
+   typedef struct _mtypeobject {
        PyHeapTypeObject ht_obj;
        boxfunction mt_box;
        unboxfunction mt_unbox;
        void* mt_data;
-   } PyMType;
+   } PyMTypeObject;
+
+   typedef struct _mobject {
+       PyObject obj;
+       void* m_data;
+    } PyMObject;
 
 ``box`` and ``unbox``
 ---------------------
@@ -26,13 +31,13 @@ structs and Python objects.
 
 .. code:: c
 
-   typedef int (*unboxfunction)(PyMTypeObject *obj, void *data);
-   typedef PyMTypeObject *(*boxfunction)(PyMType *type, void *data);
+   typedef int (*unboxfunction)(PyMObject *obj, void *data);
+   typedef PyMObject *(*boxfunction)(PyMTypeObject *type, void *data);
 
 ``boxfunction``
 ~~~~~~~~~~~~~~~
 
-The box function is defined as the layer that converts a C strcut into a
+The box function is defined as the layer that converts a C struct into a
 Python object. The function will perform error checking and will return
 an *instance* of a ``PyMType``.
 
@@ -47,7 +52,7 @@ Input Arguments
 Output Argument
 ^^^^^^^^^^^^^^^
 
--  ``PyMtypeObject *out``: A pointer to a PyMtypeObject initalized on
+-  ``PyMObject *out``: A pointer to a ``PyMObject`` initalized on
    the heap from the C struct. ``NULL`` indicates failure. If returning
    ``NULL``, a Python exception must be set.
 
@@ -62,7 +67,7 @@ to be marshalled into a C struct.
 Input Arguments
 ^^^^^^^^^^^^^^^
 
--  ``PyMTypeObject *obj``: The object to be marshalled into C.
+-  ``PyMObject *obj``: The object to be marshalled into C.
 -  ``void *data``: A pointer to the C struct to put the data into.
 
 .. _output-argument-1:
@@ -80,7 +85,7 @@ The ``__cdict__`` protocol will be used as an intermediary between
 Python level objects and C structs. This will allow a specific type
 signature to be passed from the Python Object *into* the ``unbox``
 function, then passing to a ``ctypes`` method, and then calling the
-``box`` function eventually returning a Python Object of type ``mtype``.
+``box`` function eventually returning a ``PyMObject``.
 
 This dict provides the ``boxfunction`` and the ``unboxfunction`` with
 the proper associated C type signature.
