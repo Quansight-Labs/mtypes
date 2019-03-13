@@ -32,13 +32,58 @@
 
 #include "Python.h"
 
-typedef struct _mtypeobject {
-    PyHeapTypeObject mt_obj;
-    long custom;
-} PyMTypeObject;
+typedef struct _mtypestruct PyMTypeStruct;
+typedef struct _mtypeobject PyMTypeObject;
+typedef struct _mobject PyMObject;
 
-PyAPI_DATA(PyMTypeObject) PyMType_Type;
+typedef PyMObject *(*boxfunction)(PyMTypeObject *type, void *data);
+typedef int (*unboxfunction)(PyMObject *obj, void *data);
+typedef PyMObject *(*mt_boxfunction)(PyMTypeStruct *metatype, void *data);
+typedef int (*mt_unboxfunction)(PyMTypeObject *type, void *data);
 
 PyMODINIT_FUNC PyInit__mtypes(void);
-static int PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
-static PyObject* PyMTypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int PyMType_Type_init(PyObject *self, PyObject *args, PyObject *kwds);
+
+typedef struct _mtypestruct
+{
+    PyHeapTypeObject tp_obj;
+    mt_boxfunction mt_box;
+    mt_unboxfunction mt_unbox;
+    void *mtt_data;
+} PyMTypeStruct;
+
+typedef struct _mtypeobject
+{
+    PyHeapTypeObject ht_obj;
+    boxfunction obj_box;
+    unboxfunction obj_unbox;
+    void *mt_data;
+} PyMTypeObject;
+
+typedef struct _mobject
+{
+    PyObject obj;
+    void *m_data;
+} PyMObject;
+
+PyMTypeStruct PyMType_Type = {
+    .tp_obj = {
+        .ht_type = {
+            PyVarObject_HEAD_INIT(NULL, 0)
+            .tp_name = "mtypes.mtype",
+            .tp_doc = "Custom memory type object.",
+            .tp_basicsize = sizeof(PyMTypeObject),
+            .tp_itemsize = 0,
+            .tp_flags = Py_TPFLAGS_DEFAULT,
+            .tp_new = PyMType_Type_new,
+            .tp_init = PyMType_Type_init,
+            .tp_base = &PyType_Type
+        },
+    },
+    .mt_box = NULL,
+    .mt_unbox = NULL,
+    .mtt_data = NULL,
+};
+
+PyAPI_DATA(PyMTypeStruct) PyMType_Type;
