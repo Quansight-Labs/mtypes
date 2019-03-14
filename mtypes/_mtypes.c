@@ -16,9 +16,6 @@ PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject *
 
     *args_out = NULL;
     *kwds_out = NULL;
-    PyObject *namespace_new = NULL;
-    PyObject *key = NULL;
-    PyObject *custom_obj = NULL;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOO:mtype.__new__", kwlist,
                                      &name, &bases, &namespace))
         goto fail;
@@ -27,36 +24,7 @@ PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject *
     if (*kwds_out == NULL)
         goto fail;
 
-    if (!PyDict_Check(namespace))
-    {
-        PyErr_SetString(PyExc_ValueError, "mtype.__new__ expects a dict instance in its third argument.");
-        goto fail;
-    }
-
-    namespace_new = PyDict_Copy(namespace);
-    if (namespace_new == NULL)
-        goto fail;
-
-    key = PyUnicode_FromString("custom");
-    if (key == NULL)
-        goto fail;
-
-    custom_obj = PyDict_GetItemWithError(namespace_new, key);
-    if (custom_obj == NULL)
-    {
-        if (PyErr_Occurred() == NULL)
-            PyErr_SetString(PyExc_ValueError, "mtype.__new__ expects a \"custom\" key in its third argument.");
-        goto fail;
-    }
-
-    *custom_out = PyLong_AsLong(custom_obj);
-    if (PyErr_Occurred() != NULL)
-        goto fail;
-
-    if (PyDict_DelItem(namespace_new, key) < 0)
-        goto fail;
-
-    *args_out = Py_BuildValue("(OOO)", name, bases, namespace_new);
+    *args_out = Py_BuildValue("(OOO)", name, bases, namespace);
     if (*args_out == NULL)
         goto fail;
 
@@ -65,9 +33,6 @@ PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject *
 fail:
     Py_XDECREF(*kwds_out);
     Py_XDECREF(*args_out);
-    Py_XDECREF(key);
-    Py_XDECREF(custom_obj);
-    Py_XDECREF(namespace_new);
     return -1;
 }
 
