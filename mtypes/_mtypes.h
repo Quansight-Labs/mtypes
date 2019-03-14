@@ -32,32 +32,21 @@
 
 #include "Python.h"
 
-typedef struct _mtypestruct PyMTypeStruct;
 typedef struct _mtypeobject PyMTypeObject;
 typedef struct _mobject PyMObject;
 
-typedef PyMObject *(*boxfunction)(PyMTypeObject *type, void *data);
-typedef int (*unboxfunction)(PyMObject *obj, void *data);
-typedef PyMObject *(*mt_boxfunction)(PyMTypeStruct *metatype, void *data);
-typedef int (*mt_unboxfunction)(PyMTypeObject *type, void *data);
+typedef PyObject *(*boxfunction)(PyMTypeObject *type, void *data);
+typedef int (*unboxfunction)(PyObject *obj, void *data);
 
 PyMODINIT_FUNC PyInit__mtypes(void);
 static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int PyMType_Type_init(PyObject *self, PyObject *args, PyObject *kwds);
 
-typedef struct _mtypestruct
-{
-    PyHeapTypeObject tp_obj;
-    mt_boxfunction mt_box;
-    mt_unboxfunction mt_unbox;
-    void *mtt_data;
-} PyMTypeStruct;
-
 typedef struct _mtypeobject
 {
     PyHeapTypeObject ht_obj;
-    boxfunction obj_box;
-    unboxfunction obj_unbox;
+    boxfunction box;
+    unboxfunction unbox;
     void *mt_data;
 } PyMTypeObject;
 
@@ -67,8 +56,8 @@ typedef struct _mobject
     void *m_data;
 } PyMObject;
 
-PyMTypeStruct PyMType_Type = {
-    .tp_obj = {
+PyMTypeObject PyMType_Type = {
+    .ht_obj = {
         .ht_type = {
             PyVarObject_HEAD_INIT(NULL, 0)
             .tp_name = "mtypes.mtype",
@@ -81,9 +70,9 @@ PyMTypeStruct PyMType_Type = {
             .tp_base = &PyType_Type
         },
     },
-    .mt_box = NULL,
-    .mt_unbox = NULL,
-    .mtt_data = NULL,
+    .box = NULL,
+    .unbox = NULL,
+    .mt_data = NULL,
 };
 
-PyAPI_DATA(PyMTypeStruct) PyMType_Type;
+PyAPI_DATA(PyMTypeObject) PyMType_Type;

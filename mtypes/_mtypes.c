@@ -81,8 +81,8 @@ PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
 
     PyMTypeObject* self = (PyMTypeObject *)self_obj;
     self->mt_data = NULL;
-    self->obj_box = NULL;
-    self->obj_unbox = NULL;
+    self->box = NULL;
+    self->unbox = NULL;
 
     return self_obj->ob_type->tp_base->tp_init(self_obj, args_out, kwds_out);
 fail:
