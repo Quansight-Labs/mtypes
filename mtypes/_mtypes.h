@@ -32,13 +32,47 @@
 
 #include "Python.h"
 
-typedef struct _mtypeobject {
-    PyHeapTypeObject mt_obj;
-    long custom;
-} PyMTypeObject;
+typedef struct _mtypeobject PyMTypeObject;
+typedef struct _mobject PyMObject;
 
-PyAPI_DATA(PyMTypeObject) PyMType_Type;
+typedef PyObject *(*boxfunction)(PyMTypeObject *type, void *data);
+typedef int (*unboxfunction)(PyObject *obj, void *data);
 
 PyMODINIT_FUNC PyInit__mtypes(void);
-static int PyMTypeObject_init(PyObject *self, PyObject *args, PyObject *kwds);
-static PyObject* PyMTypeObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int PyMType_Type_init(PyObject *self, PyObject *args, PyObject *kwds);
+
+typedef struct _mtypeobject
+{
+    PyHeapTypeObject ht_obj;
+    boxfunction box;
+    unboxfunction unbox;
+    void *mt_data;
+} PyMTypeObject;
+
+typedef struct _mobject
+{
+    PyObject obj;
+    void *m_data;
+} PyMObject;
+
+PyMTypeObject PyMType_Type = {
+    .ht_obj = {
+        .ht_type = {
+            PyVarObject_HEAD_INIT(NULL, 0)
+            .tp_name = "mtypes.mtype",
+            .tp_doc = "Custom memory type object.",
+            .tp_basicsize = sizeof(PyMTypeObject),
+            .tp_itemsize = 0,
+            .tp_flags = Py_TPFLAGS_DEFAULT,
+            .tp_new = PyMType_Type_new,
+            .tp_init = PyMType_Type_init,
+            .tp_base = &PyType_Type
+        },
+    },
+    .box = NULL,
+    .unbox = NULL,
+    .mt_data = NULL,
+};
+
+PyAPI_DATA(PyMTypeObject) PyMType_Type;

@@ -34,8 +34,11 @@ Currently, `mtypes` can marshall a single C `long` to and from C, more to come.
 
 ## Roadmap
  - [ ] Specify API interface
+   - [x] Specify struct API.
+   - [ ] Specify `__cdict__` API.
  - [ ] Build out the `__cdict__` protocol.
-   - [ ] Build out the `box` and `unbox` methods.
+   - [x] Build out basic structure.
+   - [x] Build out the `box` and `unbox` methods.
    - [ ] Build out implementation-selection mechanism.
    - [ ] Build out marshalling for more complex types
    - [ ] Documentation
