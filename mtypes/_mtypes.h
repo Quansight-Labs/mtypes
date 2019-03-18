@@ -34,19 +34,41 @@
 
 typedef struct _mtypeobject PyMTypeObject;
 typedef struct _mobject PyMObject;
+typedef struct _mfunc PyMTypeFunction;
+typedef struct _margument PyMTypeArgument;
 
 typedef PyObject *(*boxfunction)(PyMTypeObject *type, void *data);
 typedef int (*unboxfunction)(PyObject *obj, void *data);
+typedef int (*mt_func)(void *self, ...);
 
 PyMODINIT_FUNC PyInit__mtypes(void);
 static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int PyMType_Type_init(PyObject *self, PyObject *args, PyObject *kwds);
 
+typedef struct _mfunc
+{
+    // Analogous to ht_name, ht_slots and ht_qualname in PyHeapTypeObject
+    char *mt_name;
+    mt_func mt_slot;
+    char *mt_qualname;
+    PyMTypeArgument *arguments;
+    PyMTypeObject *mt_rettype;
+} PyMTypeFunction;
+
+typedef struct _margument
+{
+    // These fields are used to function signatures for a given function.
+    char *name;
+    PyMTypeObject *type;
+} PyMTypeArgument;
+
 typedef struct _mtypeobject
 {
     PyHeapTypeObject ht_obj;
+    // The functions used for marshaling this type in and out of Python.
     boxfunction box;
     unboxfunction unbox;
+    PyMTypeFunction *mt_funcs;
     void *mt_data;
 } PyMTypeObject;
 
@@ -60,15 +82,14 @@ PyMTypeObject PyMType_Type = {
     .ht_obj = {
         .ht_type = {
             PyVarObject_HEAD_INIT(NULL, 0)
-            .tp_name = "mtypes.mtype",
+                .tp_name = "mtypes.mtype",
             .tp_doc = "Custom memory type object.",
             .tp_basicsize = sizeof(PyMTypeObject),
             .tp_itemsize = 0,
             .tp_flags = Py_TPFLAGS_DEFAULT,
             .tp_new = PyMType_Type_new,
             .tp_init = PyMType_Type_init,
-            .tp_base = &PyType_Type
-        },
+            .tp_base = &PyType_Type},
     },
     .box = NULL,
     .unbox = NULL,
