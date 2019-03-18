@@ -7,7 +7,7 @@ Python. Also, objects instantiated from those types also have C-level
 data associated with them.
 
 ``PyMType_Type``
------------------
+----------------
 
 .. code:: c
 
@@ -24,8 +24,10 @@ as the main ``type`` to generate all other ``mtypes``.
     typedef struct _mtypeobject
     {
         PyHeapTypeObject ht_obj;
+        // The functions used for marshaling this type in and out of Python.
         boxfunction box;
         unboxfunction unbox;
+        PyMTypeFunction *mt_funcs;
         void *mt_data;
     } PyMTypeObject;
 
@@ -36,6 +38,47 @@ functionality, effectively:
 - Marshalling to and from C with the ``__cdict__`` protocol via the
   ``box`` and ``unbox`` methods.
 
+``PyMTypeFunction``
+-------------------
+
+.. code:: c
+
+    typedef struct _mfunc
+    {
+        // Analogous to ht_name, ht_slots and ht_qualname in PyHeapTypeObject
+        char *mt_name;
+        mt_func mt_slot;
+        char *mt_qualname;
+        PyMTypeArgument *arguments;
+        PyMTypeObject *mt_rettype;
+    } PyMTypeFunction;
+
+``PyMTypeFunction`` Is a struct that simply contains the functions that are implemented into the mtype.
+This will have all the methods that relate to that specific function, and will associate the functions with
+its basic attributes. 
+
+- ``mt_name`` is the argument that stores the name of the mtype.
+- ``mt_slots`` is of the type mt_func, defined in ``_mtypes.h``. It will store the function pointer (and point to the C-level function).
+- ``mt_qualname`` is used to get information about the function
+- ``PyMTypeArgument`` is explained below. It contains arguments that define the type.
+- ``mt_rettype`` is the return type of the function.
+
+``PyMTypeArgument``
+-------------------
+
+.. code:: c
+
+    typedef struct _margument
+    {
+        // These fields are used to function signatures for a given function.
+        char *name;
+        PyMTypeObject *type;
+    } PyMTypeArgument;
+
+``PyMTypeArgument`` simply contains the function signature, unique to each function. 
+- ``char *name`` is the name of the function itself.
+    This is a Non-NULL value, returning an empty sting. 
+- ``PyMTypeObject *type`` is a pointer to the type of the argument.
 
 ``PyMObject``
 --------------
