@@ -40,6 +40,15 @@ typedef struct _mtypeobject PyMTypeObject;
 typedef struct _mobject PyMObject;
 typedef struct _mfunc PyMTypeFunction;
 typedef struct _margument PyMTypeArgument;
+#ifdef MTYPES_API
+    #undef MTYPES_API
+#endif
+
+#ifdef _MSC_VER
+  #define MTYPES_API __declspec(dllexport)
+#else
+  #define MTYPES_API
+#endif
 
 typedef PyObject *(*boxfunction)(PyMTypeObject *type, void *data);
 typedef int (*unboxfunction)(PyObject *obj, void *data);
@@ -101,3 +110,5 @@ PyMTypeObject PyMType_Type = {
 };
 
 PyAPI_DATA(PyMTypeObject) PyMType_Type;
+
+#endif

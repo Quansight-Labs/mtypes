@@ -35,64 +35,34 @@
 
 // This is the inital C DICT Impletmentation.
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "_mtypes.h"
+#include <unordered_map>
 
 #ifndef TPMAP_H
 #define TPMAP_H
-// TODO: ADD API Funtions to ADD types manually
 
-// Int, Float, Complex <-- this will change in final version...have a couple ideas; but 21 ctypes.
-// https://docs.python.org/3/library/ctypes.html#fundamental-data-types
-#define ARR_INIT_SZ 21 
+#ifdef MTYPES_API
+    #undef MTYPES_API
+#endif
 
-/* mtypeNode is a node whose pointer is cast to the mapping function.
- * 
- *
- */
-typedef struct
-{
-    void *type;       // Pointer to the type that is being input; this can be anything.
-    PyMTypeObject *obj; // Pointer to Corresponding mtypeobject
-} mtypeNode;
+#ifdef _MSC_VER
+  #define MTYPES_API __declspec(dllexport)
+#else
+  #define MTYPES_API
+#endif
 
-typedef struct
-{
-    int elements;   // Current size of the array that is filled
-    int size;       // total available spaces
-    mtypeNode *data; // node pointer to the proper node that contains the data
-                    //...I don't think void* is needed.
-} marray;
+static std::unordered_map<PyTypeObject *, PyMTypeObject *> m_lookuptable;
+MTYPES_API int MLookupTable_add(PyTypeObject *type, PyMTypeObject *mtype);
+MTYPES_API PyMTypeObject *MLookupTable_get(PyTypeObject *type);
 
-int marray_init(marray *array)
-{
-    array->elements = 0;
-    array->size = ARR_INIT_SZ;
-    array->data = malloc(sizeof(mtypeNode) * array->size);
-    return 0;
+#endif
+
+#if defined(__cplusplus)
 }
-
-void marray_resize(marray *array)
-{
-    if (array->elements >= array->size)
-    {
-        array->size *= 2;
-        array->data = realloc(array->data, sizeof(mtypeNode) * array->size);
-    }
-}
-
-void marray_add(marray *array, mtypeNode *node)
-{
-    if (array->elements < array->size)
-    {
-        array->data[array->elements++] = *node;
-    }
-    else if (array->elements >= array->size)
-    {
-        marray_resize(array);
-        array->data[array->elements++] = *node;
-    }
-}
-
 #endif

@@ -90,8 +90,8 @@ setup (
         "Topic :: Software Development"
     ],
     packages = ["mtypes"],
-    package_data = {"mtypes" : ["_mtypes.h"]},
+    package_data = {"mtypes" : ["_mtypes.h", "_typemap.hpp"]},
     ext_modules = [Extension(name = "mtypes._mtypes",
-                             sources = ["mtypes/_mtypes.c"])],
+                             sources = ["mtypes/_mtypes.c", "mtypes/_typemap.cpp"])],
     python_requires=">=3.5, <4",
 )
