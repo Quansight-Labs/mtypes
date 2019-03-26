@@ -5,4 +5,4 @@ build/
 *.pyc
 *.ipynb
 docs/_build
-
+.DS_Store
