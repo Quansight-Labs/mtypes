@@ -30,7 +30,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Adding Code Guard 
+
 #include "Python.h"
+#ifndef MTYPES_H
+#define MTYPES_H
 
 typedef struct _mtypeobject PyMTypeObject;
 typedef struct _mobject PyMObject;

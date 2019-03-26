@@ -1,4 +1,5 @@
 #include "_mtypes.h"
+#include "_typemap.h"
 
 static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
