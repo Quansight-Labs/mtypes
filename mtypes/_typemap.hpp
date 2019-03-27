@@ -35,14 +35,12 @@
 
 // This is the inital C DICT Impletmentation.
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "_mtypes.h"
 #include <unordered_map>
+
 
 #ifndef TPMAP_H
 #define TPMAP_H
@@ -61,8 +59,4 @@ static std::unordered_map<PyTypeObject *, PyMTypeObject *> m_lookuptable;
 MTYPES_API int MLookupTable_add(PyTypeObject *type, PyMTypeObject *mtype);
 MTYPES_API PyMTypeObject *MLookupTable_get(PyTypeObject *type);
 
-#endif
-
-#if defined(__cplusplus)
-}
 #endif

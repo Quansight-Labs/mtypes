@@ -1,13 +1,13 @@
 #include "_mtypes.h"
 
-static PyModuleDef mtypes_module = {
+MTYPES_API static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
     .m_name = "mtypes",
     .m_doc = "Creates a meta-type extending the Python type-system for array objects.",
     .m_size = -1,
 };
 
-static int
+MTYPES_API static int
 PyMType_ArgParse(PyObject *args, PyObject *kwds, PyObject **args_out, PyObject **kwds_out, long *custom_out)
 {
     static char *kwlist[] = {"", "", "", NULL};
@@ -36,7 +36,7 @@ fail:
     return -1;
 }
 
-static int
+MTYPES_API static int
 PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
 {
     PyObject *args_out, *kwds_out;
@@ -55,7 +55,7 @@ fail:
     return -1;
 }
 
-static PyObject *
+MTYPES_API static PyObject *
 PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyObject *args_out, *kwds_out;

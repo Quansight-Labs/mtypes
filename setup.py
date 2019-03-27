@@ -1,7 +1,7 @@
 #
 # BSD 3-Clause License
 #
-# Copyright (c) 2017-2018, Quansight Labs 
+# Copyright (c) 2017-2018, Quansight Labs
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import sys, os
+from distutils.sysconfig import get_python_lib
+import sys
+import os
 import platform
 import warnings
 
@@ -39,7 +41,6 @@ if "bdist_wheel" in sys.argv:
 else:
     from distutils.core import setup, Extension
 
-from distutils.sysconfig import get_python_lib
 
 DESCRIPTION = """\
 Meta-class of type that extends Python type system to create dtype-like memory-types\
@@ -63,18 +64,18 @@ Links
 
 """
 
-setup (
-    name = "mtypes",
-    version = "0.1.1",
-    description = DESCRIPTION,
-    long_description = LONG_DESCRIPTION,
-    url = "https://github.com/Quansight-Labs/mtypes",
-    author = 'Quansight Labs',
-    author_email = 'labs@quansight.com',
-    license = "BSD License",
-    keywords = ["xnd", "array computing", "types", "memory blocks"],
-    platforms = ["Many"],
-    classifiers = [
+setup(
+    name="mtypes",
+    version="0.1.1",
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    url="https://github.com/Quansight-Labs/mtypes",
+    author='Quansight Labs',
+    author_email='labs@quansight.com',
+    license="BSD License",
+    keywords=["xnd", "array computing", "types", "memory blocks"],
+    platforms=["Many"],
+    classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
@@ -89,9 +90,11 @@ setup (
         "Topic :: Scientific/Engineering :: Mathematics",
         "Topic :: Software Development"
     ],
-    packages = ["mtypes"],
-    package_data = {"mtypes" : ["_mtypes.h", "_typemap.hpp"]},
-    ext_modules = [Extension(name = "mtypes._mtypes",
-                             sources = ["mtypes/_mtypes.c", "mtypes/_typemap.cpp"])],
+    packages=["mtypes"],
+    package_data={"mtypes": ["_mtypes.h", "_typemap.hpp"]},
+    ext_modules=[Extension(name="mtypes._mtypes",
+                           sources=["mtypes/_mtypes.c", "mtypes/_typemap.cpp"],
+                           extra_compile_args=[ "-stdlib=libc++"],
+                           language="c++20")],
     python_requires=">=3.5, <4",
 )
