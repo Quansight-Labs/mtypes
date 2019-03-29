@@ -10,7 +10,10 @@ Memory Types for Python
   - [Roadmap](#roadmap)
 
 ## Abstract
-`mtypes` aims to provide two critical things that are useful for C extension types in Python:
+
+`mtypes` aims to tie Python's type system to other C level type hierarchies.
+
+It provide two critical things that are useful for C extension types in Python:
 
 - Easy marshalling of python types between Python and C.
 - A universal mechanism for easily calling out to C code from Python.
