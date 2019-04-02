@@ -91,9 +91,9 @@ setup(
         "Topic :: Software Development"
     ],
     packages=["mtypes"],
-    package_data={"mtypes": ["_mtypes.h", "_typemap.hpp"]},
+    package_data={"mtypes": ["_mtypes.h"]},
     ext_modules=[Extension(name="mtypes._mtypes",
-                           sources=["mtypes/_mtypes.c", "mtypes/_typemap.cpp"],
+                           sources=["mtypes/_mtypes.c"],
                            extra_compile_args=[ "-stdlib=libc++"],
                            language="c++20")],
     python_requires=">=3.5, <4",

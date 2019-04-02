@@ -46,9 +46,9 @@ typedef struct _margument PyMTypeArgument;
 #endif
 
 #ifdef _MSC_VER
-  #define MTYPES_API __declspec(dllexport) extern "C" 
+  #define MTYPES_API __declspec(dllexport)
 #else
-  #define MTYPES_API extern "C" 
+  #define MTYPES_API
 #endif
 
 typedef PyObject *(*boxfunction)(PyMTypeObject *type, void *data);

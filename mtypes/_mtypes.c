@@ -1,4 +1,5 @@
 #include "_mtypes.h"
+#include "klib/khash.h"
 
 MTYPES_API static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
@@ -113,4 +114,9 @@ PyInit__mtypes(void)
     }
 
     return m;
+}
+
+int main(void){
+    typemap_destroy("typedict");
+    return 0;
 }
