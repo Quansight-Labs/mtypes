@@ -115,8 +115,3 @@ PyInit__mtypes(void)
 
     return m;
 }
-
-int main(void){
-    typemap_destroy("typedict");
-    return 0;
-}
