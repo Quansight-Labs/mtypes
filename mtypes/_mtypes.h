@@ -45,6 +45,8 @@ PyMODINIT_FUNC PyInit__mtypes(void);
 static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int PyMType_Type_init(PyObject *self, PyObject *args, PyObject *kwds);
 
+PyObject* MType_Type_getattro(PyObject *self, PyObject *attr_name);
+
 typedef struct _mfunc
 {
     // Analogous to ht_name, ht_slots and ht_qualname in PyHeapTypeObject
@@ -89,7 +91,9 @@ PyMTypeObject PyMType_Type = {
             .tp_flags = Py_TPFLAGS_DEFAULT,
             .tp_new = PyMType_Type_new,
             .tp_init = PyMType_Type_init,
-            .tp_base = &PyType_Type},
+            .tp_base = &PyType_Type,
+            .tp_getattro = MType_Type_getattro,
+        },
     },
     .box = NULL,
     .unbox = NULL,

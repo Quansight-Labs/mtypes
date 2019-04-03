@@ -1,5 +1,26 @@
 #include "_mtypes.h"
 
+PyObject* MType_Type_getattro(PyObject *o, PyObject *attr_name) {
+    PyMTypeObject *self = (PyMTypeObject *)o;
+    PyObject *ret = PyObject_GenericGetAttr(o, attr_name);
+
+    if (ret != NULL)
+        return ret;
+
+    const char* c_name = PyUnicode_AsUTF8(attr_name);
+    if (c_name == NULL)
+        goto fail;
+
+    for (PyMTypeFunction* iter = self->mt_funcs; iter->mt_name != NULL; iter++) {
+        if (strcmp(iter->mt_name, c_name) == 0) {
+            return PyLong_FromLong(99);
+        }
+    }
+
+    fail:
+    return NULL;
+}
+
 static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
     .m_name = "mtypes",
@@ -48,7 +69,9 @@ PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
     self->mt_data = NULL;
     self->box = NULL;
     self->unbox = NULL;
-    self->mt_funcs = NULL;
+    self->mt_funcs = malloc(sizeof(PyMTypeFunction) + 1);
+    self->mt_funcs[0].mt_name = "potato";
+    self->mt_funcs[1].mt_name = NULL;
 
     return self_obj->ob_type->tp_base->tp_init(self_obj, args_out, kwds_out);
 fail:
