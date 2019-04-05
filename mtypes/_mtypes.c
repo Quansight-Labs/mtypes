@@ -2,18 +2,24 @@
 
 PyObject* MType_Type_getattro(PyObject *o, PyObject *attr_name) {
     PyMTypeObject *self = (PyMTypeObject *)o;
-    PyObject *ret = PyObject_GenericGetAttr(o, attr_name);
+    //PyObject *ret = PyObject_GenericGetAttr(o, attr_name);
 
-    if (ret != NULL)
-        return ret;
+    // if (ret != NULL)
+    //     return ret;
 
     const char* c_name = PyUnicode_AsUTF8(attr_name);
     if (c_name == NULL)
         goto fail;
-
+    Py_INCREF(attr_name);
     for (PyMTypeFunction* iter = self->mt_funcs; iter->mt_name != NULL; iter++) {
-        if (strcmp(iter->mt_name, c_name) == 0) {
-            return PyLong_FromLong(99);
+    // char* iter = self->mt_funcs[0].mt_name;
+        if (strcmp(c_name, "potato") == 0) {
+            return PyUnicode_FromString("Fries");
+            Py_DECREF(attr_name);
+        }
+        if (strcmp(c_name, "tomato") == 0) {
+            return PyUnicode_FromString("Ketchup");
+            Py_DECREF(attr_name);
         }
     }
 
@@ -69,9 +75,10 @@ PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
     self->mt_data = NULL;
     self->box = NULL;
     self->unbox = NULL;
-    self->mt_funcs = malloc(sizeof(PyMTypeFunction) + 1);
+    self->mt_funcs = malloc(sizeof(PyMTypeFunction) * 10);
     self->mt_funcs[0].mt_name = "potato";
-    self->mt_funcs[1].mt_name = NULL;
+    self->mt_funcs[1].mt_name = "tomato";
+    self->mt_funcs[2].mt_name = NULL;
 
     return self_obj->ob_type->tp_base->tp_init(self_obj, args_out, kwds_out);
 fail:
