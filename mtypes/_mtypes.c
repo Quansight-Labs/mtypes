@@ -1,30 +1,28 @@
 #include "_mtypes.h"
 
-PyObject* MType_Type_getattro(PyObject *o, PyObject *attr_name) {
+PyObject *MType_Type_getattro(PyObject *o, PyObject *attr_name)
+{
     PyMTypeObject *self = (PyMTypeObject *)o;
-    //PyObject *ret = PyObject_GenericGetAttr(o, attr_name);
 
-    // if (ret != NULL)
-    //     return ret;
-
-    const char* c_name = PyUnicode_AsUTF8(attr_name);
+    const char *c_name = PyUnicode_AsUTF8(attr_name);
     if (c_name == NULL)
         goto fail;
+
     Py_INCREF(attr_name);
-    for (PyMTypeFunction* iter = self->mt_funcs; iter->mt_name != NULL; iter++) {
-    // char* iter = self->mt_funcs[0].mt_name;
-        if (strcmp(c_name, "potato") == 0) {
-            return PyUnicode_FromString("Fries");
-            Py_DECREF(attr_name);
-        }
-        if (strcmp(c_name, "tomato") == 0) {
-            return PyUnicode_FromString("Ketchup");
+    for (PyMTypeFunction *iter = self->mt_funcs; iter->mt_name != NULL; iter++)
+    {
+        if (strcmp(c_name, iter->mt_name) == 0)
+        {
+            return iter->mt_rettype;
             Py_DECREF(attr_name);
         }
     }
 
-    fail:
+fail:
     return NULL;
+
+    Py_XDECREF(attr_name);
+    Py_DECREF(attr_name);
 }
 
 static PyModuleDef mtypes_module = {
@@ -63,6 +61,16 @@ fail:
     return -1;
 }
 
+// int _funcslotgen(PyObject *args, PyObject *kwds) {
+//     // Function Generateor for Number of Slots
+//     // There should be a function for every
+// }
+static int PyMTypeFunction_Set(PyMTypeFunction *self, PyObject *item)
+{
+    self->mt_rettype = item;
+    return 0;
+}
+
 static int
 PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
 {
@@ -71,14 +79,20 @@ PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
     if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
         goto fail;
 
-    PyMTypeObject* self = (PyMTypeObject *)self_obj;
+    PyMTypeObject *self = (PyMTypeObject *)self_obj;
     self->mt_data = NULL;
     self->box = NULL;
     self->unbox = NULL;
+
     self->mt_funcs = malloc(sizeof(PyMTypeFunction) * 10);
+    //int _funcs = 3;
+    // for(int i = 0; i < _funcs; i++) {
     self->mt_funcs[0].mt_name = "potato";
+    PyMTypeFunction_Set(&self->mt_funcs[0], PyUnicode_FromString("Fries"));
     self->mt_funcs[1].mt_name = "tomato";
+    PyMTypeFunction_Set(&self->mt_funcs[1], PyUnicode_FromString("Ketchup"));
     self->mt_funcs[2].mt_name = NULL;
+    //}
 
     return self_obj->ob_type->tp_base->tp_init(self_obj, args_out, kwds_out);
 fail:

@@ -54,7 +54,7 @@ typedef struct _mfunc
     mt_func mt_slot;
     char *mt_qualname;
     PyMTypeArgument *arguments;
-    PyMTypeObject *mt_rettype;
+    PyObject *mt_rettype;
 } PyMTypeFunction;
 
 typedef struct _margument
