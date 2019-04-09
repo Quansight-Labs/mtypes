@@ -1,6 +1,16 @@
 #include "_mtypes.h"
 
-PyObject *MType_Type_getattro(PyObject *o, PyObject *attr_name)
+PyMObject* MFunction_Call(PyObject* o, PyObject *a, PyObject *kw)
+{
+    // Figure out number of arguments
+    // Allocate the void**
+    // Unbox stuff, and put in in the void**
+    // Call our own mt_func(void **)
+    // Box stuff up
+    // Return the boxed stuff
+}
+
+PyMTypeObject *MType_Type_getattro(PyObject *o, PyObject *attr_name)
 {
     PyMTypeObject *self = (PyMTypeObject *)o;
 
@@ -19,10 +29,8 @@ PyObject *MType_Type_getattro(PyObject *o, PyObject *attr_name)
     }
 
 fail:
-    return NULL;
-
-    Py_XDECREF(attr_name);
     Py_DECREF(attr_name);
+    return NULL;
 }
 
 static PyModuleDef mtypes_module = {
@@ -61,15 +69,14 @@ fail:
     return -1;
 }
 
-// int _funcslotgen(PyObject *args, PyObject *kwds) {
-//     // Function Generateor for Number of Slots
-//     // There should be a function for every
-// }
-static int PyMTypeFunction_Set(PyMTypeFunction *self, PyObject *item)
+
+static int PyMTypeFunction_Set(PyMTypeFunction *self, char *name, PyObject *item)
 {
+    self->mt_name = name;
     self->mt_rettype = item;
     return 0;
 }
+
 
 static int
 PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
@@ -83,16 +90,11 @@ PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
     self->mt_data = NULL;
     self->box = NULL;
     self->unbox = NULL;
-
     self->mt_funcs = malloc(sizeof(PyMTypeFunction) * 10);
-    //int _funcs = 3;
-    // for(int i = 0; i < _funcs; i++) {
-    self->mt_funcs[0].mt_name = "potato";
-    PyMTypeFunction_Set(&self->mt_funcs[0], PyUnicode_FromString("Fries"));
-    self->mt_funcs[1].mt_name = "tomato";
-    PyMTypeFunction_Set(&self->mt_funcs[1], PyUnicode_FromString("Ketchup"));
+    PyMTypeFunction_Set(&self->mt_funcs[0], "potato", PyUnicode_FromString("Fries"));
+    PyMTypeFunction_Set(&self->mt_funcs[1], "tomato", PyUnicode_FromString("Ketchup"));
     self->mt_funcs[2].mt_name = NULL;
-    //}
+    PyMObject a;
 
     return self_obj->ob_type->tp_base->tp_init(self_obj, args_out, kwds_out);
 fail:

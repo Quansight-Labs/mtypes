@@ -36,10 +36,11 @@ typedef struct _mtypeobject PyMTypeObject;
 typedef struct _mobject PyMObject;
 typedef struct _mfunc PyMTypeFunction;
 typedef struct _margument PyMTypeArgument;
+typedef struct _mfuncimpl PyMFunctionImplementation;
 
 typedef PyObject *(*boxfunction)(PyMTypeObject *type, void *data);
-typedef int (*unboxfunction)(PyObject *obj, void *data);
-typedef int (*mt_func)(void *self, ...);
+typedef int (*unboxfunction)(PyMObject *obj, void *data);
+typedef void* (*mt_func)(void **);
 
 PyMODINIT_FUNC PyInit__mtypes(void);
 static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -49,13 +50,16 @@ PyObject* MType_Type_getattro(PyObject *self, PyObject *attr_name);
 
 typedef struct _mfunc
 {
-    // Analogous to ht_name, ht_slots and ht_qualname in PyHeapTypeObject
-    char *mt_name;
-    mt_func mt_slot;
-    char *mt_qualname;
-    PyMTypeArgument *arguments;
-    PyObject *mt_rettype;
+    PyTypeObject mt_func;
+    PyMFunctionImplementation *impls;
 } PyMTypeFunction;
+
+typedef struct _mfuncimpl
+{
+    mt_func mt_slot;
+    PyMTypeArgument *arguments;
+    PyMTypeObject *mt_rettype;
+} PyMFunctionImplementation;
 
 typedef struct _margument
 {
