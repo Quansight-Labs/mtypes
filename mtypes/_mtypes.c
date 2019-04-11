@@ -1,16 +1,25 @@
 #include "_mtypes.h"
-
-PyMObject* MFunction_Call(PyObject* o, PyObject *a, PyObject *kw)
+PyObject* MFunction_Call(PyObject* o, PyObject *a, PyObject *kw)
 {
-    // Figure out number of arguments
-    // Allocate the void**
-    // Unbox stuff, and put in in the void**
-    // Call our own mt_func(void **)
-    // Box stuff up
-    // Return the boxed stuff
-}
+    
 
-PyMTypeObject *MType_Type_getattro(PyObject *o, PyObject *attr_name)
+    // Figure out number of arguments
+    // - Number and Types for Args -> match to each signature in function // a = mtypes.mtype(mtypes.mint(5), '5.1')
+    // Allocate the void**
+    // - void **ll_args = malloc(sizeof(void *) * (nargs + 1))
+    // Unbox stuff, and put in in the void**
+    // for (int i = 0; i < nargs; i++) {
+    //     ll_args[i] = o.type[i].unbox(py_arg[i]) // From selected sig
+    // }
+    // ll_args[nargs] = NULL;
+    // void *ll_out = o.mt_slot(ll_args) // From selected sig
+    // PyObject* a = o.ret_type.box(ll_out);
+    // Return the boxed stuff
+    PyMTypeObject *self = (PyMTypeObject *)a;
+    return self;
+};
+
+PyObject* MType_Type_getattro(PyObject *o, PyObject *attr_name)
 {
     PyMTypeObject *self = (PyMTypeObject *)o;
 
@@ -19,11 +28,11 @@ PyMTypeObject *MType_Type_getattro(PyObject *o, PyObject *attr_name)
         goto fail;
 
     Py_INCREF(attr_name);
-    for (PyMTypeFunction *iter = self->mt_funcs; iter->mt_name != NULL; iter++)
+    for (PyMTypeFunction *iter = self->mt_data; iter->mt_data != NULL; iter++)
     {
-        if (strcmp(c_name, iter->mt_name) == 0)
+        if (strcmp(c_name, iter->(mt_data)) == 0)
         {
-            return iter->mt_rettype;
+            return iter->mt_data;
             Py_DECREF(attr_name);
         }
     }
@@ -70,10 +79,10 @@ fail:
 }
 
 
-static int PyMTypeFunction_Set(PyMTypeFunction *self, char *name, PyObject *item)
+static int PyMTypeFunction_Set(PyMTypeFunction *self, char *name, PyMObject *item)
 {
     self->mt_name = name;
-    self->mt_rettype = item;
+    self->mt_rettype = item.obj;
     return 0;
 }
 
@@ -158,5 +167,31 @@ PyInit__mtypes(void)
         return NULL;
     }
 
+    PyObject* args = Py_BuildValue("(sOO)", "mlong", Py_BuildValue("(O)", PyLong_Type), PyDict_New());
+    PyObject* kw = PyDict_New();
+    *mlong = PyObject_Call((PyObject *)PyMType_Type, args, kw);
+    Py_XDECREF(args);
+    Py_XDECREF(kw);
+    mlong.box = mint_box;
+    mlong.unbox = mlong_unbox;
+    
+
     return m;
+}
+
+PyMTypeObject mlong;
+void *mint_unbox(PyObject *o) {
+    void* value = malloc(sizeof(long));
+    *value = PyLong_AsLong((PyObject *)o);
+    return value;
+}
+
+PyMObject *mint_box(void *value) {
+    PyObject* args = Py_BuildValue("(l)", &value);
+    PyObject* kw = PyDict_New();
+    obj = PyObject_Call(mlong, args);
+    Py_XDECREF(args);
+    Py_XDECREF(kw);
+
+    return obj;
 }
