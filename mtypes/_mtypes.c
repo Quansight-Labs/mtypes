@@ -1,6 +1,6 @@
 #include "_mtypes.h"
-// PyObject* MFunction_Call(PyObject* o, PyObject *a, PyObject *kw)
-// {
+PyObject* MFunction_Call(PyObject* o, PyObject *a, PyObject *kw)
+{
     
 
     // Figure out number of arguments
@@ -13,34 +13,34 @@
     // }
     // ll_args[nargs] = NULL;
     // void *ll_out = o.mt_slot(ll_args) // From selected sig
-    // PyObject* a = o.ret_type.box(ll_out);
+    // PyMObject* a = o.ret_type.box(ll_out);
     // Return the boxed stuff
-//     PyMTypeObject *self = (PyMTypeObject *)a;
-//     return self;
-// };
+    // PyMTypeObject *self = (PyMTypeObject *)a;
+    return o;
+};
 
-PyObject* MType_Type_getattro(PyObject *o, PyObject *attr_name)
-{
-    PyMTypeObject *self = (PyMTypeObject *)o;
+// PyObject* MType_Type_getattro(PyObject *o, PyObject *attr_name)
+// {
+//     PyMTypeObject *self = (PyMTypeObject *)o;
 
-    const char *c_name = PyUnicode_AsUTF8(attr_name);
-    if (c_name == NULL)
-        goto fail;
+//     const char *c_name = PyUnicode_AsUTF8(attr_name);
+//     if (c_name == NULL)
+//         goto fail;
 
-    Py_INCREF(attr_name);
-    for (PyMObject *iter = self->mt_data; iter->attr_name != NULL; iter++)
-    {
-        if (strcmp(c_name, PyUnicode_AsUTF8(iter->attr_name)) == 0)
-        {
-            return &iter->obj;
-            Py_DECREF(attr_name);
-        }
-    }
+//     Py_INCREF(attr_name);
+//     for (PyMObject *iter = self->mt_data; iter->attr_name != NULL; iter++)
+//     {
+//         if (strcmp(c_name, PyUnicode_AsUTF8(iter->attr_name)) == 0)
+//         {
+//             return &iter->obj;
+//             Py_DECREF(attr_name);
+//         }
+//     }
 
-fail:
-    Py_DECREF(attr_name);
-    return NULL;
-}
+// fail:
+//     Py_DECREF(attr_name);
+//     return NULL;
+// }
 
 static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
@@ -90,35 +90,16 @@ fail:
 static int
 PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
 {
-    PyObject *args_out, *kwds_out;
-    long custom;
-    if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
+    if (self_obj->ob_type->tp_base->tp_init(self_obj, args, kwds) < 0)
         goto fail;
 
     PyMTypeObject *self = (PyMTypeObject *)self_obj;
-    self->mt_data = NULL;
     self->box = NULL;
     self->unbox = NULL;
-    self->mt_data = malloc(sizeof(PyMObject) * 10);
-
-
-    return self_obj->ob_type->tp_base->tp_init(self_obj, args_out, kwds_out);
+    self->mt_data = NULL;
+    return 0;
 fail:
     return -1;
-}
-
-static PyObject *
-PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    PyObject *args_out, *kwds_out;
-    long custom;
-    if (PyMType_ArgParse(args, kwds, &args_out, &kwds_out, &custom) < 0)
-        goto fail;
-
-    return type->tp_base->tp_new(type, args_out, kwds_out);
-
-fail:
-    return NULL;
 }
 
 PyMODINIT_FUNC
@@ -126,43 +107,15 @@ PyInit__mtypes(void)
 {
     PyObject *m;
     if (PyType_Ready((PyTypeObject *)&PyMType_Type) < 0)
-    {
-        return NULL;
-    }
+        goto fail;
 
     m = PyModule_Create(&mtypes_module);
     if (m == NULL)
-    {
-        return NULL;
-    }
+        goto fail;
 
-    Py_INCREF((PyObject *)&PyMType_Type);
+    // Py_INCREF((PyObject *)&PyMType_Type);
     if (PyModule_AddObject(m, "mtype", (PyObject *)&PyMType_Type) < 0)
-    {
-    }
-
-    m = PyModule_Create(&mtypes_module);
-    if (m == NULL)
-    {
-        return NULL;
-    }
-
-    Py_INCREF((PyObject *)&PyMType_Type);
-    if (PyModule_AddObject(m, "mtype", (PyObject *)&PyMType_Type) < 0)
-    {
-    }
-
-    m = PyModule_Create(&mtypes_module);
-    if (m == NULL)
-    {
-        return NULL;
-    }
-
-    Py_INCREF((PyObject *)&PyMType_Type);
-    if (PyModule_AddObject(m, "mtype", (PyObject *)&PyMType_Type) < 0)
-    {
-        return NULL;
-    }
+        goto fail;
 
     // PyObject* args = Py_BuildValue("(sOO)", "mlong", Py_BuildValue("(O)", PyLong_Type), PyDict_New());
     // PyObject* kw = PyDict_New();
@@ -174,6 +127,9 @@ PyInit__mtypes(void)
     
 
     return m;
+fail:
+    Py_XDECREF(&PyMType_Type);
+    return NULL;
 }
 
 // PyMTypeObject mlong;

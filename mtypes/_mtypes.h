@@ -47,7 +47,6 @@ typedef void* (*lowlevel_func)(void **);
 PyMODINIT_FUNC PyInit__mtypes(void);
 static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int PyMType_Type_init(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject* MType_Type_getattro(PyObject *self, PyObject *attr_name);
 
 
 typedef struct _mfunc
@@ -80,7 +79,6 @@ typedef struct _mtypeobject
 typedef struct _mobject
 {
     PyObject obj;
-    PyObject *attr_name; 
     void *m_data;
 } PyMObject;
 
@@ -96,7 +94,7 @@ PyTypeObject PyMFunctionType = {
     .tp_itemsize = 0,
     .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_base = &PyFunction_Type,
-    .tp_call = MFunction_Call,
+    // .tp_call = MFunction_Call,
 };
 
 PyMTypeObject PyMType_Type = {
@@ -108,10 +106,8 @@ PyMTypeObject PyMType_Type = {
             .tp_basicsize = sizeof(PyMTypeObject),
             .tp_itemsize = 0,
             .tp_flags = Py_TPFLAGS_DEFAULT,
-            .tp_new = PyMType_Type_new,
             .tp_init = PyMType_Type_init,
             .tp_base = &PyType_Type,
-            .tp_getattro = MType_Type_getattro,
         },
     },
     .box = NULL,
