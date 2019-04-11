@@ -65,7 +65,7 @@ typedef struct _mfuncimpl
 
 typedef struct _margument
 {
-    char *type; // Function Signature Name 
+    char *name; // Function Signature Name 
     PyMTypeObject *type; // Stored MTypeObject Name
 } PyMTypeArgument;
 
@@ -80,6 +80,7 @@ typedef struct _mtypeobject
 typedef struct _mobject
 {
     PyObject obj;
+    PyObject *attr_name; 
     void *m_data;
 } PyMObject;
 
