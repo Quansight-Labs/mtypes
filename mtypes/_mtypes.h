@@ -115,6 +115,11 @@ PyMTypeObject PyMType_Type = {
     .mt_data = NULL,
 };
 
-
+PyMObject *mobj_create(PyObject *o, void *data) {
+    PyMObject *mobj = NULL;
+    mobj->obj = *o;
+    mobj->m_data = data;
+    return mobj;
+}
 PyAPI_DATA(PyMTypeObject) PyMType_Type;
 #endif
