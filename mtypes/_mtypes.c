@@ -52,7 +52,8 @@ fail:
     return -1;
 }
 
-PyMTypeObject mlong;
+
+
 void *mint_unbox(void *o) {
     long* value = malloc(sizeof(long));
     *value = PyLong_AsLong((PyObject *)o);
@@ -78,15 +79,17 @@ PyInit__mtypes(void)
 
     if (PyModule_AddObject(m, "mtype", (PyObject *)&PyMType_Type) < 0)
         goto fail;
-
+    
+    PyMTypeObject mlong;
     PyObject* args = Py_BuildValue("(sOO)", "mlong", Py_BuildValue("(O)", PyLong_Type), PyDict_New());
     PyObject* kw = PyDict_New();
-    // *mlong = PyObject_Call((PyObject *)PyMType_Type, args, kw);
-    // Py_XDECREF(args);
-    // Py_XDECREF(kw);
-    // mlong.box = mint_box;
-    // mlong.unbox = mlong_unbox;
+    // PyMTypeObject *mlong = NULL;
+    mlong.box = mint_box;
+    mlong.unbox = mint_unbox;
+    Py_XDECREF(args);
+    Py_XDECREF(kw);
     
+    //mlong->ht_obj = PyObject_Call((PyObject *)new, args, kw);
 
     return m;
 fail:
