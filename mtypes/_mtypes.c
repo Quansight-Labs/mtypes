@@ -37,6 +37,24 @@ fail:
     return -1;
 }
 
+//static PyMTypeObject* MTypeObject_Call(PyMTypeObject* callable, PyObject *args, PyObject *kwargs) {
+    // This is a function that is *essentially* PyObject_Call but it calls an MTypeObject.
+    // ternaryfunc call; // This works
+    // // TODO: add args and kwargs into the ht_slots
+    // call = callable->ht_obj.ht_type.tp_call;
+    // PyMTypeObject* result;
+    // assert(!PyErr_Occurred());
+    // assert(PyTuple_Check(args));
+    // assert(kwargs == NULL || PyDict_Check(kwargs));
+    // // PyMTypeObject *test;
+    // // return test;
+    // // result = (*call)
+
+    
+
+//     return call;
+//  };
+
 static int
 PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
 {
@@ -69,7 +87,11 @@ PyMObject *mint_box(void *value) {
 PyMODINIT_FUNC
 PyInit__mtypes(void)
 {
-    PyObject *m;
+    PyObject *m = NULL;
+    PyObject* args = NULL;
+    PyMTypeObject *mlong = NULL;
+    PyObject* kw = NULL;
+
     if (PyType_Ready((PyTypeObject *)&PyMType_Type) < 0)
         goto fail;
 
@@ -77,23 +99,32 @@ PyInit__mtypes(void)
     if (m == NULL)
         goto fail;
 
+    args = Py_BuildValue("(sOO)", "mlong", Py_BuildValue("(O)", PyLong_Type), PyDict_New());
+    kw = PyDict_New();
+    // // mlong = mtype("mlong", (long,), {})
+    // mlong = (PyMTypeObject *) PyObject_Call((PyObject*) (&PyMType_Type), args, kw);
+    // if (mlong == NULL)
+    //     goto fail;
+    // mlong->box = mint_box;
+    // mlong->unbox = mint_unbox;
+
     if (PyModule_AddObject(m, "mtype", (PyObject *)&PyMType_Type) < 0)
         goto fail;
-    
-    PyMTypeObject mlong;
-    PyObject* args = Py_BuildValue("(sOO)", "mlong", Py_BuildValue("(O)", PyLong_Type), PyDict_New());
-    PyObject* kw = PyDict_New();
-    // PyMTypeObject *mlong = NULL;
-    mlong.box = mint_box;
-    mlong.unbox = mint_unbox;
-    Py_XDECREF(args);
-    Py_XDECREF(kw);
-    
-    //mlong->ht_obj = PyObject_Call((PyObject *)new, args, kw);
+
+    // if (PyModule_AddObject(m, "mlong", (PyObject *)mlong) < 0)
+    //     goto fail;
+
+    // PyObject *mlong = PyObject_Call((PyObject *)&mtlong, args, kw);
+    // Py_DECREF(args);
+    // Py_DECREF(kw);
+    // (PyObject *)mlong;
 
     return m;
 fail:
-    Py_XDECREF(&PyMType_Type);
+    Py_XDECREF(m);
+    Py_XDECREF(args);
+    Py_XDECREF(kw);
+    Py_XDECREF(mlong);
     return NULL;
 }
 

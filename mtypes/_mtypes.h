@@ -83,16 +83,7 @@ typedef struct _mobject
 } PyMObject;
 
 PyObject* MFunction_Call(PyObject* o, PyObject *a, PyObject *kw);
-static PyMTypeObject* MTypeObject_Call(PyMTypeObject* callable, PyObject *args, PyObject *kwargs) {
-    // This is a function that is *essentially* PyObject_Call but it creates an MTypeObject.
-    ternaryfunc call; // This works
-    // TODO: add args and kwargs into the ht_slots
-    assert(!PyErr_Occurred());
-    assert(PyTuple_Check(args));
-    assert(kwargs == NULL || PyDict_Check(kwargs));
-    // PyMTypeObject *test;
-    // return test;
-};
+static PyMTypeObject* MTypeObject_Call(PyMTypeObject* callable, PyObject *args, PyObject *kwargs); 
 
 
 
@@ -118,7 +109,6 @@ PyMTypeObject PyMType_Type = {
             .tp_flags = Py_TPFLAGS_DEFAULT,
             .tp_init = PyMType_Type_init,
             .tp_base = &PyType_Type,
-            // .tp_call = MTypeObject_Call,
         },
     },
     .box = NULL,
