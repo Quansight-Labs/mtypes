@@ -4,7 +4,7 @@
 static PyModuleDef mtypes_module = {
     PyModuleDef_HEAD_INIT,
     .m_name = "mtypes",
-    .m_doc = "Creates a meta-type extending the Python type-system for array objects.",
+    .m_doc = "Creates a meta-type extending the Python type-system to be cooperative with a variety of types.",
     .m_size = -1,
 };
 
@@ -37,24 +37,6 @@ fail:
     return -1;
 }
 
-//static PyMTypeObject* MTypeObject_Call(PyMTypeObject* callable, PyObject *args, PyObject *kwargs) {
-    // This is a function that is *essentially* PyObject_Call but it calls an MTypeObject.
-    // ternaryfunc call; // This works
-    // // TODO: add args and kwargs into the ht_slots
-    // call = callable->ht_obj.ht_type.tp_call;
-    // PyMTypeObject* result;
-    // assert(!PyErr_Occurred());
-    // assert(PyTuple_Check(args));
-    // assert(kwargs == NULL || PyDict_Check(kwargs));
-    // // PyMTypeObject *test;
-    // // return test;
-    // // result = (*call)
-
-    
-
-//     return call;
-//  };
-
 static int
 PyMType_Type_init(PyObject *self_obj, PyObject *args, PyObject *kwds)
 {
@@ -71,14 +53,19 @@ fail:
 }
 
 
-
-void *mint_unbox(void *o) {
-    long* value = malloc(sizeof(long));
-    *value = PyLong_AsLong((PyObject *)o);
+/*
+ * Takes in a generic type of specific degree
+ * (i.e. JS Long, Java Long)
+ * and 'unboxes' to a C long.
+ */
+long mint_unbox(void *o) {
+    // this is going to take in a generic object,
+    // and return a C object.
+    long value = PyLong_AsLong((PyObject *)o);
     return value;
 }
 
-PyMObject *mint_box(void *value) {
+PyMObject *mint_box(PyObject *value) {
     PyObject *obj = PyLong_FromLong((long)value);
     PyMObject *mobj = mobj_create(obj, NULL);
     return mobj;
@@ -88,8 +75,9 @@ PyMODINIT_FUNC
 PyInit__mtypes(void)
 {
     PyObject *m = NULL;
-    PyObject* args = NULL;
-    PyMTypeObject *mlong = NULL;
+    PyObject *args = NULL;
+    PyMTypeObject *mtlong = NULL;
+    PyMObject *molong = NULL;
     PyObject* kw = NULL;
 
     if (PyType_Ready((PyTypeObject *)&PyMType_Type) < 0)
@@ -99,22 +87,19 @@ PyInit__mtypes(void)
     if (m == NULL)
         goto fail;
 
-    args = Py_BuildValue("(sOO)", "mlong", Py_BuildValue("(O)", PyLong_Type), PyDict_New());
+    args = Py_BuildValue("(sOO)", "mlong", PyLong_Type, PyDict_New());
     kw = PyDict_New();
-    // // mlong = mtype("mlong", (long,), {})
-    // mlong = (PyMTypeObject *) PyObject_Call((PyObject*) (&PyMType_Type), args, kw);
-    // if (mlong == NULL)
-    //     goto fail;
-    // mlong->box = mint_box;
-    // mlong->unbox = mint_unbox;
-
+    molong->obj = *PyObject_Call((PyObject *)&mtlong, args, kw);
+    mtlong->box = mint_box;
+    mtlong->unbox = mint_unbox;
+    if (mtlong == NULL)
+        goto fail;
     if (PyModule_AddObject(m, "mtype", (PyObject *)&PyMType_Type) < 0)
         goto fail;
+    if (PyModule_AddObject(m, "mlong", (PyObject *)mtlong) < 0)
+        goto fail;
 
-    // if (PyModule_AddObject(m, "mlong", (PyObject *)mlong) < 0)
-    //     goto fail;
-
-    // PyObject *mlong = PyObject_Call((PyObject *)&mtlong, args, kw);
+    
     // Py_DECREF(args);
     // Py_DECREF(kw);
     // (PyObject *)mlong;
@@ -124,7 +109,7 @@ fail:
     Py_XDECREF(m);
     Py_XDECREF(args);
     Py_XDECREF(kw);
-    Py_XDECREF(mlong);
+    //Py_XDECREF(mlong);
     return NULL;
 }
 

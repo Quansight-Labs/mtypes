@@ -42,7 +42,7 @@ typedef struct _mfuncimpl PyMFunctionImplementation;
 
 typedef PyMObject *(*boxfunction)(void *data);
 typedef void* (*unboxfunction)(void *obj);
-typedef void* (*lowlevel_func)(void **);
+//typedef void* (*lowlevel_func)(void **);
 
 PyMODINIT_FUNC PyInit__mtypes(void);
 static PyObject *PyMType_Type_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
