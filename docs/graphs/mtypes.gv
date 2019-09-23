@@ -1,0 +1,70 @@
+digraph G {
+graph[
+];
+node [
+font = "Helvetica"
+fontsize = "16"
+shape="record"
+];
+edge [
+font = "Helvetica"
+fontsize = "16"
+];
+_mtypeobject -> _PyMType_Type;
+_mfuncimp:f2 -> _margument:f0;
+_mfunc:f2 -> _mfuncimp: f0;
+_mtypeobject [
+        label = "{PyMTypeObject|
+		+ ht_obj : PyHeapTypeObject\l|
+		+ box : boxfunction\l
+		+ unbox: unboxfunction\l|
+		+ mt_data : void *\l}"
+            ]
+_mobject [
+        label = "{PyMObject|
+		+ obj : PyObject\l|
+		+ mdata : void *\l}"
+		]
+_margument [
+        label = "{<f0> PyMTypeArgument|
+	    	+ name: char *\l
+		    + type: PyMTypeObject *\l}"
+            	]
+_mfuncimp [
+        label = "{<f0> PyMFunctionImplementation|
+                <f1> + mt_slot: lowlevel_func\l|
+                <f2> + signature : PyMTypeArgument *\l|
+                <f3> + mt_rettype : PyMTypeObject\l|}"
+                ]
+_mfunc [
+        label = "{<f0> PyMTypeFunction|
+		<f1> + mf_func : PyObject\l|
+		<f2> + impl : PyMFunctionImplementation *\l|}"
+		]
+_PyMType_Type [
+        label = "{PyMType_Type|
+                . ht_obj.ht_type\l
+                + PyVarObject_HEAD_INIT(NULL, 0)\l|
+                . tp_name : 'mtypes.mtype'\l|
+                . tp_doc : str\l|
+                . tp_basicsize : sizeof(PyMTypeObject)\l
+                . tp_itemsize : 0\l
+                . tp_flags : Py_TPFLAGS_DEFAULT\l
+                . tp_init : PyMType_Type_init\l
+                . tp_base : &PyType_Type\l|
+                . box : NULL\l
+                . unbox : NULL\l
+                . mt_data : NULL\l}"
+                ]
+_PyMFunctionType [
+                label = "{PyMFunctionType|
+		PyVarObject_HEAD_INIT(NULL, 0)\l|
+                . tp_name : 'mtypes.mfunction'\l
+		. tp_doc : str\l
+		. tp_basicsize : sizeof(PyMTypeFunction)\l
+        	. tp_itemsize : 0\l
+		. tp_flags : Py_TPFLAGS_DEFAULT\l
+		. tp_base : &PyFunction_Type\l
+                . tp_call : NULL}"
+		]
+}

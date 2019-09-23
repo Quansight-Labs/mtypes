@@ -11,10 +11,10 @@ apt-get -y update && \
 apt-get -y upgrade && \
 apt-get install -y build-essential && \
 apt-get install -y software-properties-common && \
-apt-get install -y vim htop curl git wget gdb vagrind lldb
+apt-get install -y htop curl git wget gdb vagrind lldb
 
 
-# Setting up environment for Miniconda
+# Setting up environment for conda
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV PATH /opt/conda/bin:$PATH
 
