@@ -1,0 +1,53 @@
+#+TITLE: mtypes
+
+-- Understanding Memory --
+To write mtypes, a deep understanding of how computer memory works is required.
+In order to better understand this, there are a series of small c programs that
+can be found in here.
+
+-- Motivation --
+
+Experimenting as a scientist in the present day is still as exciting as ever.
+The only difference is that Python has become a native way for science to be
+translated into simulations on computers, has become the de-facto entry language
+for the rapidly emerging data science market, and is still making web
+developers happy today. In such a diverse ecosystem, Python has an incredibly
+difficult job and must cater to a multitude of niche fields.
+
+This means that Python typically has to co-exist and communitcate with different
+languges in order to understand them properly. The CPython API provides access
+to C, which we can easily leverage to our advantage in order to produce this
+kind of functionality.
+
+An (unseen) immediate benefit of this is that Python's internal representation
+of types and objects are seperated, and no more tied together.
+
+Therefore, we have mtypes. A Python meta-type, which will extend Python to
+understand other languages natively.
+
+-- Abstract --
+
+Current implementations of the C-Python API dictate that all Python Objects have
+corresponding types that represent them.
+
+There are two main benefits that mtypes immedietley presents itself through:
+
+1) types and objects will be seperated out-of-the-box
+2) multiple languages can have corresponding types in python, extending
+   the overall epython ecosystem.
+
+Why are these important?
+
+1) Types and Objects can be "recasted" easily, without much effort
+2) Python libraries used for scientific computation become significantly more
+   accessible
+
+#+BEGIN_SRC C
+#+END_SRC
+
+--- Python ---
+mtypes allows for the seperation of types and objects in Python. It does this by
+leveraging the CPython API, and maintaing the data betweeen C and Python. mtypes
+are, put simply, extentions of the current CPython Objects. In
+
+--- Commmunication Protocol ---
